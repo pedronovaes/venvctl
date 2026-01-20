@@ -40,3 +40,25 @@ Notes:
   - To deactivate, run: deactivate
 EOF
 }
+
+# Initialize variables.
+ENV_NAME=""
+REQ_FILE=""
+VERBOSE=false
+LIST=false
+ACTIVATE_ENV=""
+DELETE_ENV=""
+
+# Argument parsing.
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --help|-h) show_help; exit 0 ;;
+        --list) LIST=true; shift ;;
+        --activate) ACTIVATE_ENV="${2:-}"; shift 2 ;;
+        --delete) DELETE_ENV="${2:-}"; shift 2 ;;
+        --name|-n) ENV_NAME="${2:-}"; shift 2 ;;
+        --req|-r) REQ_FILE="${2:-}"; shift 2 ;;
+        --verbose|-v) VERBOSE=true; shift ;;
+        *) echo "Unknown option: $1"; echo "Use 'venvctl --help'"; exit 1 ;;
+    esac
+done
