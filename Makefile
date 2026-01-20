@@ -21,4 +21,7 @@ uninstall:
 	@sudo rm -f /etc/venvctl.conf
 	@echo "[INFO] Uninstallation complete!"
 
-.PHONY: install uninstall
+verify:
+	@which venvctl >/dev/null 2>&1 && echo "venvctl is installed and available." || echo "venvctl not found in PATH"
+
+.PHONY: install uninstall verify
