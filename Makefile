@@ -24,4 +24,9 @@ uninstall:
 verify:
 	@which venvctl >/dev/null 2>&1 && echo "venvctl is installed and available." || echo "venvctl not found in PATH"
 
-.PHONY: install uninstall verify
+check:
+	@echo "Running full test suite ..."
+	@bash ./tests/run_all.sh
+	@echo "All tests completed."
+
+.PHONY: install uninstall verify check
