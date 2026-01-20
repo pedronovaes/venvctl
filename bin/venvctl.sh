@@ -29,8 +29,7 @@ Optional flags:
   --req, -r <file>          requirements.txt file containing libraries to be
                             installed
   --verbose, -v             show detailed messages during the process
-  --list                    list all environments created in $BASE_DIR
-  --activate <env_name>     activate the specified environment
+  --list, -l                list all environments created in $BASE_DIR
   --delete <env_name>       delete the specified environment
   --help, -h                show this documentation
 
@@ -53,11 +52,10 @@ DELETE_ENV=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --help|-h) show_help; exit 0 ;;
-        --list) LIST=true; shift ;;
-        --activate) ACTIVATE_ENV="${2:-}"; shift 2 ;;
-        --delete) DELETE_ENV="${2:-}"; shift 2 ;;
         --name|-n) ENV_NAME="${2:-}"; shift 2 ;;
         --req|-r) REQ_FILE="${2:-}"; shift 2 ;;
+        --list|-l) LIST=true; shift ;;
+        --delete) DELETE_ENV="${2:-}"; shift 2 ;;
         --verbose|-v) VERBOSE=true; shift ;;
         *) echo "Unknown option: $1"; echo "Use 'venvctl --help'"; exit 1 ;;
     esac
@@ -70,9 +68,17 @@ if [ "$LIST" = true ]; then
     exit 0
 fi
 
-# Activate environment.
-
 # Delete environment.
+if [ -n "$DELETE_ENV" ]; then
+    TARGET_DIR="$BASE_DIR/$DELETE_ENV"
+    if [ -d "$TARGET_DIR" ]; then
+        rm -rf "$TARGET_DIR"
+        echo "Environment '$DELETE_ENV' removed from $BASE_DIR"
+    else
+        echo "Environment '$DELETE_ENV' not found in $BASE_DIR"
+    fi
+    exit 0
+fi
 
 # Validation.
 if [ -z "$ENV_NAME" ]; then
@@ -94,5 +100,18 @@ pip install --upgrade pip
 $VERBOSE && echo "[INFO] Done."
 
 # Package installation.
+if [ -n "$REQ_FILE" ]; then
+    if [ -f "$REQ_FILE" ]; then
+        $VERBOSE && echo "[INFO] Installing packages from $REQ_FILE ..."
+        pip install -r "$REQ_FILE" --no-cache
+        $VERBOSE && echo "[INFO] Packages sucessfully installed:"
+        $VERBOSE && pip list
+    else
+        echo "Warning: file $REQ_FILE not found. No packages installed."
+    fi
+fi
 
 # Finalization.
+echo "Virtual environment created succesfully."
+echo "To activate, run: source $TARGET_DIR/bin/activate"
+echo "To deactivate, run: deactivate"
