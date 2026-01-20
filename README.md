@@ -1,6 +1,6 @@
 # venvctl
 
-**virtual environment control** (venvctl, inspired by systemctl) is a Bash utility to manage Python virtual environments in a fixed directory defined at installation. It simplifies the workflow of creating, activating, listing, and removing environments, ensuring consistency across projects.
+**virtual environment control** (venvctl, inspired by systemctl) is a Bash utility to manage Python virtual environments in a fixed directory defined at installation. It simplifies the workflow of creating, listing, and removing environments, ensuring consistency across projects.
 
 ## Installation
 
@@ -27,7 +27,7 @@ ENV_DIR=/home/pedro/projects/envs
 Run this command to ensure the installation was successful:
 
 ```bash
-venvctl --help
+make verify
 ```
 
 ### Uninstallation
@@ -39,3 +39,39 @@ sudo make uninstall
 ```
 
 This will delete both `/usr/local/bin/venvctl` and `/etc/venvctl.conf`.
+
+## Usage
+
+To create a Python virtual environment, run this command:
+
+```bash
+venvctl --name my_env
+```
+
+Or run this command, if you want to install some libraries at the same time:
+
+```bash
+venvctl --name my_env --req requirements.txt
+```
+
+You also can list all virtual environments installed:
+
+```bash
+venvctl --list
+```
+
+Or delete some virtual environment:
+
+```bash
+venvct --delete my_env
+```
+
+For more informations, please check the documentation: `venvctl --help`
+
+## Requirements
+
+To install and use this tool, you need:
+- Python3
+- virtualenv
+- make
+- sudo
