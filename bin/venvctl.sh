@@ -62,3 +62,37 @@ while [[ $# -gt 0 ]]; do
         *) echo "Unknown option: $1"; echo "Use 'venvctl --help'"; exit 1 ;;
     esac
 done
+
+# List environments.
+if [ "$LIST" = true ]; then
+    echo "Available environments in $BASE_DIR:"
+    ls -1 "$BASE_DIR"
+    exit 0
+fi
+
+# Activate environment.
+
+# Delete environment.
+
+# Validation.
+if [ -z "$ENV_NAME" ]; then
+    echo "Error: you must provide --name <env_name>"
+    echo "Use 'venvctl --help' for instructions."
+    exit 1
+fi
+
+# Environment creation.
+TARGET_DIR="$BASE_DIR/$ENV_NAME"
+$VERBOSE && echo "[INFO] Creating virtual environment named '$ENV_NAME' in $TARGET_DIR ..."
+virtualenv -p python3 "$TARGET_DIR"
+source "$TARGET_DIR/bin/activate"
+$VERBOSE && echo "[INFO] Done."
+
+# Pip updating.
+$VERBOSE && echo "[INFO] Updating pip ..."
+pip install --upgrade pip
+$VERBOSE && echo "[INFO] Done."
+
+# Package installation.
+
+# Finalization.
