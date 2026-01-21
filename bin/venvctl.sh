@@ -28,9 +28,9 @@ Required flags:
 Optional flags:
   --req, -r <file>          requirements.txt file containing libraries to be
                             installed
-  --verbose, -v             show detailed messages during the process
   --list, -l                list all environments created in $BASE_DIR
   --delete <env_name>       delete the specified environment
+  --verbose, -v             show detailed messages during the process
   --help, -h                show this documentation
 
 Notes:
@@ -43,15 +43,16 @@ EOF
 # Initialize variables.
 ENV_NAME=""
 REQ_FILE=""
-VERBOSE=false
-LIST=false
 ACTIVATE_ENV=""
 DELETE_ENV=""
+VERBOSE=false
+LIST=false
+HELP=false
 
 # Argument parsing.
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --help|-h) show_help; exit 0 ;;
+        --help|-h) HELP=true; shift ;;
         --name|-n) ENV_NAME="${2:-}"; shift 2 ;;
         --req|-r) REQ_FILE="${2:-}"; shift 2 ;;
         --list|-l) LIST=true; shift ;;
@@ -61,10 +62,36 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Exclusive flag validations.
+if $LIST && { [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]] || [[ -n "$DELETE_ENV" ]] || $HELP; }; then
+    echo "Error: --list flag should be used alone."
+    exit 1
+fi
+
+if [ -n "$DELETE_ENV" ] && { $LIST || $HELP || [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]]; }; then
+    echo "Error: --delete flag should be used alone."
+    exit 1
+fi
+
+if $HELP && { $LIST || [[ -n "$DELETE_ENV" ]] || [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]]; }; then
+    echo "Error: --help flag should be used alone."
+    exit 1
+fi
+
+# Show help.
+if $HELP; then
+    show_help
+    exit 0
+fi
+
 # List environments.
-if [ "$LIST" = true ]; then
-    echo "Available environments in $BASE_DIR:"
-    ls -1 "$BASE_DIR"
+if $LIST; then
+    if [ -z "$(ls -A "$BASE_DIR")" ]; then
+        echo "No enviroments found. Use 'venvctl --name <env_name>' to create one."
+    else
+        echo "Available environments in $BASE_DIR:"
+        ls -1 "$BASE_DIR"
+    fi
     exit 0
 fi
 
@@ -80,7 +107,7 @@ if [ -n "$DELETE_ENV" ]; then
     exit 0
 fi
 
-# Validation.
+# Creating new env Validation.
 if [ -z "$ENV_NAME" ]; then
     echo "Error: you must provide --name <env_name>"
     echo "Use 'venvctl --help' for instructions."
@@ -92,12 +119,12 @@ TARGET_DIR="$BASE_DIR/$ENV_NAME"
 $VERBOSE && echo "[INFO] Creating virtual environment named '$ENV_NAME' in $TARGET_DIR ..."
 virtualenv -p python3 "$TARGET_DIR"
 source "$TARGET_DIR/bin/activate"
-$VERBOSE && echo "[INFO] Done."
+$VERBOSE && echo "[INFO] Environment created."
 
 # Pip updating.
 $VERBOSE && echo "[INFO] Updating pip ..."
 pip install --upgrade pip
-$VERBOSE && echo "[INFO] Done."
+$VERBOSE && echo "[INFO] Pip updated."
 
 # Package installation.
 if [ -n "$REQ_FILE" ]; then
