@@ -1,5 +1,5 @@
 <div align="center">
-    <img src=".github/images/logo.png" width="80%" />
+    <img src=".github/images/logo.png" width="70%" />
     <h2>VIrtual environment control</h2>
 </div>
 
