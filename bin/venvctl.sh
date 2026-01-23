@@ -19,8 +19,8 @@ mkdir -p "$BASE_DIR"
 
 show_help() {
     cat << EOF
+Venvctl
 Usage: venvctl --name <env_name> [options]
-Script to manage Python virtual environments.
 
 Required flags:
   --name, -n <env_name>     name of the virtual environment to be created
@@ -58,7 +58,7 @@ while [[ $# -gt 0 ]]; do
         --list|-l) LIST=true; shift ;;
         --delete) DELETE_ENV="${2:-}"; shift 2 ;;
         --verbose|-v) VERBOSE=true; shift ;;
-        *) echo "Unknown option: $1"; echo "Use 'venvctl --help'"; exit 1 ;;
+        *) echo "venvctl: invalid option: $1"; echo "Try 'venvctl --help'"; exit 1 ;;
     esac
 done
 
@@ -87,7 +87,7 @@ fi
 # List environments.
 if $LIST; then
     if [ -z "$(ls -A "$BASE_DIR")" ]; then
-        echo "No enviroments found. Use 'venvctl --name <env_name>' to create one."
+        echo "No environments found. Try 'venvctl --name <env_name>' to create one."
     else
         echo "Available environments in $BASE_DIR:"
         ls -1 "$BASE_DIR"
@@ -110,7 +110,7 @@ fi
 # Creating new env Validation.
 if [ -z "$ENV_NAME" ]; then
     echo "Error: you must provide --name <env_name>"
-    echo "Use 'venvctl --help' for instructions."
+    echo "Try 'venvctl --help' for instructions."
     exit 1
 fi
 
@@ -139,6 +139,6 @@ if [ -n "$REQ_FILE" ]; then
 fi
 
 # Finalization.
-echo "Virtual environment created succesfully."
+echo "Virtual environment created successfully."
 echo "To activate, run: source $TARGET_DIR/bin/activate"
 echo "To deactivate, run: deactivate"
