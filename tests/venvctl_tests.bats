@@ -87,3 +87,9 @@ teardown() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"not found"* ]]
 }
+
+@test "Error when using invalid flag option" {
+    run $SCRIPT --invalid
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"venvctl: invalid option"* ]]
+}
