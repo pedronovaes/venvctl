@@ -1,6 +1,9 @@
-# venvctl
+<div align="center">
+    <img src=".github/images/logo.png" width="80%" />
+    <h2>VIrtual environment control</h2>
+</div>
 
-**virtual environment control** (venvctl, inspired by systemctl) is a Bash utility to manage Python virtual environments in a fixed directory defined at installation. It simplifies the workflow of creating, listing, and removing environments, ensuring consistency across projects.
+venvctl (inspired by systemctl) is a lightweight Bash utility to manage Python virtual environments in a fixed directory defined at installation. It simplifies the workflow of creating, listing, and removing environments, ensuring consistency across projects.
 
 ## Installation
 
