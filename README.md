@@ -68,6 +68,22 @@ venvct --delete my_env
 
 For more informations, please check the documentation: `venvctl --help`
 
+## Suite tests
+
+Venvctl uses **bats** (Bash Automated Testing System) to run its integration and functionality tests. To run the full test suite locally, install bats and then execute the tests from the project root:
+
+```bash
+sudo apt update
+sudo apt install bats
+
+make check
+```
+
+If you want to run some one specific test and see detailed output, execute this command:
+
+```bash
+bats --verbose-run tests/venvctl_tests.bats -f "Creates environment with --name"
+```
 ## Requirements
 
 To install and use this tool, you need:
@@ -75,3 +91,4 @@ To install and use this tool, you need:
 - virtualenv
 - make
 - sudo
+- bats

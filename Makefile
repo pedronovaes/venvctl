@@ -25,8 +25,7 @@ verify:
 	@which venvctl >/dev/null 2>&1 && echo "venvctl is installed and available." || echo "venvctl not found in PATH"
 
 check:
-	@echo "Running full test suite ..."
-	@bash ./tests/run_all.sh
-	@echo "All tests completed."
+	@rm -rf /tmp/tmp_envs /tmp/mocks
+	@bats tests/venvctl_tests.bats
 
 .PHONY: install uninstall verify check
