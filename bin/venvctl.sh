@@ -43,7 +43,6 @@ EOF
 # Initialize variables.
 ENV_NAME=""
 REQ_FILE=""
-ACTIVATE_ENV=""
 DELETE_ENV=""
 VERBOSE=false
 LIST=false
@@ -62,21 +61,56 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Exclusive flag validations.
-if $LIST && { [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]] || [[ -n "$DELETE_ENV" ]] || $HELP; }; then
-    echo "Error: --list flag should be used alone."
-    exit 1
-fi
+# All validations.
+validate_args() {
+    # Exclusive flag validations.
+    if $LIST && { [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]] || [[ -n "$DELETE_ENV" ]] || $HELP; }; then
+        echo "Error: --list flag should be used alone."
+        exit 1
+    fi
+    if [ -n "$DELETE_ENV" ] && { $LIST || $HELP || [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]]; }; then
+        echo "Error: --delete must be used alone."
+        exit 1
+    fi
+    if $HELP && { $LIST || [[ -n "$DELETE_ENV" ]] || [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]]; }; then
+        echo "Error: --help must be used alone."
+        exit 1
+    fi
 
-if [ -n "$DELETE_ENV" ] && { $LIST || $HELP || [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]]; }; then
-    echo "Error: --delete flag should be used alone."
-    exit 1
-fi
+    # --name validation.
+    if [[ -z "$ENV_NAME" && -z "$DELETE_ENV" && $LIST == false && $HELP == false ]]; then
+        echo "Error: you must provide --name <env_name>"
+        echo "Try 'venvctl --help' for instructions."
+        exit 1
+    fi
 
-if $HELP && { $LIST || [[ -n "$DELETE_ENV" ]] || [[ -n "$ENV_NAME" ]] || [[ -n "$REQ_FILE" ]]; }; then
-    echo "Error: --help flag should be used alone."
-    exit 1
-fi
+    if [[ -n "$ENV_NAME" && "$ENV_NAME" == -* ]]; then
+        echo "Error: --name requires a valid environment name"
+        echo "Try 'venvctl --help' for instructions."
+        exit 1
+    fi
+
+    # --req validation.
+    if [[ -n "$REQ_FILE" ]]; then
+        if [[ "$REQ_FILE" == -* ]]; then
+            echo "Error: --req requires a valid file path"
+            echo "Try 'venvctl --help' for instructions."
+            exit 1
+        fi
+        if [[ ! -f "$REQ_FILE" ]]; then
+            echo "Error: requirements file '$REQ_FILE' not found"
+            exit 1
+        fi
+    fi
+
+    # --delete validation.
+    if [[ -n "$DELETE_ENV" && "$DELETE_ENV" == -* ]]; then
+        echo "Error: --delete requires a valid environment name"
+        exit 1
+    fi
+}
+
+validate_args
 
 # Show help.
 if $HELP; then
@@ -95,9 +129,10 @@ if $LIST; then
     exit 0
 fi
 
-# Delete environment.
+# Delete environments.
 if [ -n "$DELETE_ENV" ]; then
     TARGET_DIR="$BASE_DIR/$DELETE_ENV"
+
     if [ -d "$TARGET_DIR" ]; then
         rm -rf "$TARGET_DIR"
         echo "Environment '$DELETE_ENV' removed from $BASE_DIR"
@@ -105,13 +140,6 @@ if [ -n "$DELETE_ENV" ]; then
         echo "Environment '$DELETE_ENV' not found in $BASE_DIR"
     fi
     exit 0
-fi
-
-# Creating new env Validation.
-if [ -z "$ENV_NAME" ]; then
-    echo "Error: you must provide --name <env_name>"
-    echo "Try 'venvctl --help' for instructions."
-    exit 1
 fi
 
 # Environment creation.
@@ -126,17 +154,14 @@ $VERBOSE && echo "[INFO] Updating pip ..."
 pip install --upgrade pip
 $VERBOSE && echo "[INFO] Pip updated."
 
-# Package installation.
+# Packages installation.
 if [ -n "$REQ_FILE" ]; then
-    if [ -f "$REQ_FILE" ]; then
-        $VERBOSE && echo "[INFO] Installing packages from $REQ_FILE ..."
-        pip install -r "$REQ_FILE" --no-cache
-        $VERBOSE && echo "[INFO] Packages sucessfully installed:"
-        $VERBOSE && pip list
-    else
-        echo "Warning: file $REQ_FILE not found. No packages installed."
-    fi
+    $VERBOSE && echo "[INFO] Installing packages from $REQ_FILE..."
+    pip install -r "$REQ_FILE" --no-cache
+    $VERBOSE && echo "[INFO] Packages sucessfully installed:"
+    $VERBOSE && pip list
 fi
+
 
 # Finalization.
 echo "Virtual environment created successfully."
