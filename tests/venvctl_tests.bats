@@ -70,8 +70,8 @@ teardown() {
 
 @test "Warns when requirements.txt does not exist" {
     run $SCRIPT --name testenv3 --req nonexistent.txt
-    [ "$status" -eq 0 ]
-    [[ "$output" == *"Warning: file nonexistent.txt not found"* ]]
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Error: requirements file 'nonexistent.txt' not found"* ]]
 }
 
 @test "Deletes existing environment" {
@@ -82,14 +82,26 @@ teardown() {
     [ ! -d "$ENV_DIR/testenv_del" ]
 }
 
-@test "Error when deleting non-existent environment" {
+@test "Deletes non-existent environment" {
     run $SCRIPT --delete notfound
     [ "$status" -eq 0 ]
     [[ "$output" == *"not found"* ]]
 }
 
-@test "Error when using invalid flag option" {
+@test "Using invalid flag option" {
     run $SCRIPT --invalid
     [ "$status" -eq 1 ]
     [[ "$output" == *"venvctl: invalid option"* ]]
+}
+
+@test "Using --name with an invalid env name" {
+    run $SCRIPT --name --invalid-name
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Error: --name requires a valid environment name"* ]]
+}
+
+@test "Using --req with an invalid req file" {
+    run $SCRIPT --name testenv --req --invalid-req-file
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Error: --req requires a valid file path"* ]]
 }
