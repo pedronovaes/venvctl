@@ -1,5 +1,5 @@
 <div align="center">
-    <img src=".github/images/logo.png" width="70%" />
+    <img src=".github/images/logo.png" width="65%" />
     <h2>virtual environment control</h2>
 </div>
 
@@ -12,7 +12,7 @@ To install venvctl, just clone this repository and install it using the provided
 ```bash
 git clone https://github.com/pedronovaes/venvctl.git
 cd venvctl
-make install
+sudo make install
 ```
 
 By default, all environments will be stored in `~/.venvs`. If you want to customize this directory, specify it during installation:
@@ -21,11 +21,13 @@ By default, all environments will be stored in `~/.venvs`. If you want to custom
 sudo make install ENV_DIR=~/projects/envs
 ```
 
-This will generate a configuration file at `/etc/venvctl.conf`:
+This will generate a configuration file at `/etc/venvctl.conf` with the following content. Later, if you wish to change the virtual env installation directory, you can modify the content of this file.
 
 ```bash
 ENV_DIR=/home/pedro/projects/envs
 ```
+
+Later,
 
 Run this command to ensure the installation was successful:
 
